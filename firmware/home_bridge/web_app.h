@@ -159,7 +159,7 @@ $('splogo').outerHTML=LOGO;$('barlogo').innerHTML=LOGO;$('bmenu').innerHTML=P(I.
 async function api(p,body){try{const r=await fetch(p,body?{method:'POST',body:new URLSearchParams(body)}:{});let j={};try{j=await r.json()}catch(e){}
 unreachable=false;return{ok:r.ok,status:r.status,j}}catch(e){unreachable=true;return{ok:false,status:0,j:{error:'Can\'t reach Haven'}}}}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2600)}
-function splashDone(){const w=Math.max(0,1500-(Date.now()-started));setTimeout(()=>$('splash').classList.add('out'),w)}
+function splashDone(){if(location.hash=='#splash')return;const w=Math.max(0,1500-(Date.now()-started));setTimeout(()=>$('splash').classList.add('out'),w)}
 function go(v,id){const h='#'+v+(v=='device'?'/'+(id??devId):'');if(location.hash!=h&&v!='login')return location.hash=h;show(v,id)}
 function show(v,id){view=v;if(id!=null)devId=+id;closeMenu();window.scrollTo(0,0);render(true);if(v=='device')loadHist();if(v=='wifi')scanWifi();if(v=='add')$('view')&&scanDevices()}
 async function load(){const r=await api('/api/state');if(r.status==401){authMode=r.j.auth;view='login';render(true);return splashDone()}

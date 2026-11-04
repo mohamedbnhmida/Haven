@@ -3,6 +3,7 @@ can be designed and screenshotted without the ESP32.
 
     python3 tools/preview.py            → http://localhost:8080
     python3 tools/preview.py --login    → sign-in screen, on :8081
+    http://localhost:8080/#splash       → splash screen held, for screenshots
 """
 import json, math, re, sys, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
