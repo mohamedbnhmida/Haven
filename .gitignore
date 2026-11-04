@@ -1,0 +1,4 @@
+firmware/home_bridge/secrets.h
+tools/.venv/
+apk/
+__pycache__/
