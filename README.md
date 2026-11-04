@@ -6,12 +6,18 @@
   <img alt="Alexa and Google Home" src="https://img.shields.io/badge/Alexa%20%C2%B7%20Google%20Home-Sinric%20Pro-FF7A59?style=flat-square">
 </p>
 
-**Haven** turns Bluetooth-only smart devices into Wi-Fi ones. An ESP32 holds the Bluetooth link to an
-**AwoX SmartPLUG** (and optionally a **Shada LED's light** colour bulb) and puts them on your network
-with a web app, schedules, energy monitoring, and voice control through Alexa or Google Home.
+**Haven** turns Bluetooth-only smart devices into Wi-Fi ones. An ESP32 holds the Bluetooth links and puts
+the devices on your network with a web app, schedules, energy monitoring, and voice control through Alexa or Google Home.
 
-Neither device has a cloud of its own. Their protocols were recovered from the vendors' Android apps
-(see [docs/awox_smartplug.md](docs/awox_smartplug.md) and [PLAN.md](PLAN.md)); neither needs pairing or encryption.
+## Compatible devices
+
+| Device | Type | Haven support |
+|---|---|---|
+| AwoX SmartPLUG (Revogi SMP-B16-FR, FR socket) | Smart plug | On/off, live power, energy, schedules, timer, Alexa / Google |
+| Revogi SMP-B13-UK, SMP-B16-GR | Smart plug | Same protocol; untested |
+| Shada LED's light bulb (art. 600750) | Colour bulb | On/off, colour, warm white, brightness, schedules, timer, Alexa / Google |
+
+Protocol notes: [docs/awox_smartplug.md](docs/awox_smartplug.md) and [PLAN.md](PLAN.md).
 
 ## Screenshots
 
