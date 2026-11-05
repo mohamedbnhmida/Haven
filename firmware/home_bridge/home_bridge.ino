@@ -72,6 +72,11 @@ void serialCommands() {
     if (!err) delay(200), ESP.restart();
   } else if (cmd == "scan") {
     Serial.println(scanJson());
+  } else if (cmd == "factory-reset") {  // same as holding BOOT 5 s
+    prefs.clear();
+    Serial.println("everything cleared, restarting into Haven-Setup");
+    delay(200);
+    ESP.restart();
   } else if (cmd == "wifi-reset") {
     for (const char* k : {"ssid", "pass", "pwd", "token"}) prefs.remove(k);
     Serial.println("wifi + password cleared, restarting into Haven-Setup");

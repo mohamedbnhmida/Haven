@@ -99,6 +99,7 @@ flowchart LR
 | `scan` | Lists nearby plugs and lamps |
 | `add plug\|lamp <address> [name]` | Adds a device without the app |
 | `wifi-reset` | Forgets Wi-Fi and the password (devices and schedules stay) |
+| `factory-reset` | Erases everything, like holding BOOT for 5 s |
 
 ## Development
 

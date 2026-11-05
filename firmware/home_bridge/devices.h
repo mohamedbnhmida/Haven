@@ -256,7 +256,10 @@ String scanJson() {
     if ((!plug && !lamp) || deviceIndex(addr) >= 0) continue;
     JsonObject o = out.add<JsonObject>();
     o["address"] = addr, o["type"] = a.getAddress().getType(), o["kind"] = plug ? "plug" : "lamp";
-    o["name"] = !a.getName().empty() ? a.getName().c_str() : (plug ? "Smart plug" : "Lamp"), o["rssi"] = a.getRSSI();
+    String name = a.getName().c_str();
+    name.trim();  // some devices advertise blanks / NULs instead of no name
+    if (name.isEmpty() || !isPrintable(name[0])) name = plug ? "Smart plug" : "Lamp";
+    o["name"] = name, o["rssi"] = a.getRSSI();
   }
   scan->clearResults();
   String s;
