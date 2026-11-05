@@ -16,9 +16,9 @@
   <text x="344" y="210" font-size="112" font-weight="800" fill="url(#t)">Haven</text>
   <text x="348" y="268" font-size="32" fill="#9B99B8">Your Bluetooth home, on Wi-Fi and voice.</text>
   <g font-size="20" font-weight="600" fill="#F1F0FA">
-    <rect x="348" y="300" width="150" height="40" rx="20" fill="#ffffff10"/><text x="373" y="327">ESP32 bridge</text>
-    <rect x="510" y="300" width="128" height="40" rx="20" fill="#ffffff10"/><text x="535" y="327">Schedules</text>
-    <rect x="650" y="300" width="186" height="40" rx="20" fill="#ffffff10"/><text x="675" y="327">Energy monitor</text>
-    <rect x="848" y="300" width="214" height="40" rx="20" fill="#ffffff10"/><text x="873" y="327">Alexa · Google Home</text>
+    <rect x="348" y="300" width="178" height="40" rx="20" fill="#ffffff10"/><text x="373" y="327">ESP32 bridge</text>
+    <rect x="538" y="300" width="149" height="40" rx="20" fill="#ffffff10"/><text x="563" y="327">Schedules</text>
+    <rect x="699" y="300" width="197" height="40" rx="20" fill="#ffffff10"/><text x="724" y="327">Energy monitor</text>
+    <rect x="908" y="300" width="250" height="40" rx="20" fill="#ffffff10"/><text x="933" y="327">Alexa · Google Home</text>
   </g>
 </svg>
