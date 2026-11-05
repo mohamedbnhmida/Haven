@@ -18,7 +18,7 @@ const char kOgImage[] PROGMEM = R"svg(<svg xmlns="http://www.w3.org/2000/svg" vi
 <path d="M15 31 32 17l17 14" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M35 26 25 39h7l-3 11 11-14h-7l2-10z" fill="#fff"/></g>
 <text x="400" y="300" font-family="Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-size="120" font-weight="800" fill="#F1F0FA">Haven</text>
-<text x="404" y="380" font-family="Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-size="40" fill="#9B99B8">Your Bluetooth home, on Wi-Fi and voice.</text></svg>)svg";
+<text x="404" y="380" font-family="Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-size="40" fill="#9B99B8">Bluetooth devices bridge.</text></svg>)svg";
 
 const char kManifest[] PROGMEM = R"json({"name":"Haven","short_name":"Haven","description":"Control your Bluetooth plugs and lights from anywhere in the house.",
 "start_url":"/","display":"standalone","background_color":"#09090F","theme_color":"#09090F",
@@ -33,7 +33,7 @@ const char kApp[] PROGMEM = R"html(<!doctype html><html lang=en><head><meta char
 <meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes>
 <meta name=apple-mobile-web-app-status-bar-style content=black-translucent><meta name=apple-mobile-web-app-title content=Haven>
 <meta property=og:type content=website><meta property=og:site_name content=Haven><meta property=og:title content="Haven">
-<meta property=og:description content="Your Bluetooth home, on Wi-Fi and voice."><meta property=og:image content="/og.svg">
+<meta property=og:description content="Bluetooth devices bridge."><meta property=og:image content="/og.svg">
 <meta name=twitter:card content=summary_large_image>
 <link rel=icon type="image/svg+xml" href="/icon.svg"><link rel=apple-touch-icon href="/icon.svg"><link rel=manifest href="/manifest.webmanifest">
 <style>
@@ -133,7 +133,7 @@ background:#232335;border:1px solid var(--line);font-weight:600;font-size:14px;t
 </style></head><body>
 <div id=splash><div class=sp><div class=sp-logo><i class=ring></i><i class=ring></i><svg id=splogo></svg></div>
 <div class=word><span>H</span><span style="animation-delay:.08s">a</span><span style="animation-delay:.16s">v</span><span style="animation-delay:.24s">e</span><span style="animation-delay:.32s">n</span></div>
-<div class=tag>Your Bluetooth home, on Wi-Fi.</div></div></div>
+<div class=tag>Bluetooth devices bridge.</div></div></div>
 <div class=wrap>
 <header class=bar id=bar><div class=logo id=barlogo></div><div class=brand><b>Haven</b><small><i class=dot id=bdot></i><span id=bsub>Connecting…</span></small></div>
 <button class=ib id=bnet title=Network onclick="go('network')"></button><button class=ib id=bmenu title=Menu onclick="toggleMenu(event)"></button>

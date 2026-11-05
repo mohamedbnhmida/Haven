@@ -14,7 +14,7 @@
     <path d="M35 26 25 39h7l-3 11 11-14h-7l2-10z" fill="#fff"/>
   </g>
   <text x="344" y="210" font-size="112" font-weight="800" fill="url(#t)">Haven</text>
-  <text x="348" y="268" font-size="32" fill="#9B99B8">Your Bluetooth home, on Wi-Fi and voice.</text>
+  <text x="348" y="268" font-size="32" fill="#9B99B8">Bluetooth devices bridge.</text>
   <g font-size="20" font-weight="600" fill="#F1F0FA">
     <rect x="348" y="300" width="178" height="40" rx="20" fill="#ffffff10"/><text x="373" y="327">ESP32 bridge</text>
     <rect x="538" y="300" width="149" height="40" rx="20" fill="#ffffff10"/><text x="563" y="327">Schedules</text>
