@@ -1,6 +1,11 @@
 <p align="center"><img src="docs/banner.svg" alt="Haven — Bluetooth devices bridge" width="100%"></p>
 
 <p align="center">
+  <img src="docs/works-with-alexa.svg" height="52" alt="Works with Alexa">&nbsp;
+  <img src="docs/works-with-google-home.svg" height="52" alt="Works with Google Home">
+</p>
+
+<p align="center">
   <img alt="ESP32" src="https://img.shields.io/badge/ESP32-Arduino%20core%203.3-7C5CFF?style=flat-square">
   <img alt="Bluetooth LE" src="https://img.shields.io/badge/Bluetooth%20LE-NimBLE-A792FF?style=flat-square">
   <img alt="Alexa and Google Home" src="https://img.shields.io/badge/Alexa%20%C2%B7%20Google%20Home-Sinric%20Pro-FF7A59?style=flat-square">
