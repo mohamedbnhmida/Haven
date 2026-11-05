@@ -212,14 +212,14 @@ function deviceView(){const d=dev();if(!d){view='home';return homeView()}
  let h=`<button class=back onclick="go('home')">${P(I.back,18)} All devices</button>
  <section class=card><div class=row><div class=sp1><h2 style="margin:0">${esc(d.name)}</h2><div class="mute small">${plug?'Smart plug':'Colour lamp'} · ${esc(d.address.toUpperCase())}</div></div>
  <span class="pill ${d.linked?'ok':'warn'}"><i class="dot ${d.linked?'ok':'warn'}"></i>${d.linked?'Connected':'Searching…'}</span><button class=ib onclick="devSettings()">${P(I.gear,20)}</button></div>
- <button class="power ${d.on&&d.linked?'on':''}" ${d.linked?'':'disabled'} onclick="setDev(${d.id},{on:${d.on?0:1}})">${P(I.power,66)}</button>
+ <button class="power ${d.on&&d.linked?'on':''}" ${d.linked?'':'disabled'} style="${lampGlow(d)}" onclick="setDev(${d.id},{on:${d.on?0:1}})">${P(I.power,66)}</button>
  <div class=big>${!d.linked?'Out of reach':d.on?'On':'Off'}</div>
  <div class="center mute small">${!d.linked?`Make sure it has power and is within ~10 m.${d.reconnects?' Reconnected '+d.reconnects+'×.':''}`:'Connected for '+fmtDur(d.linkedFor)}</div></section>`;
  if(plug)h+=`<section class=card><div class=sec><h3>Energy</h3><span class="mute small">last 24 h</span></div>
  <div class=stats><div class=stat><b>${d.linked?fmtW(d.powerMw):'—'}</b><span>Now</span></div><div class=stat><b>${fmtWh(d.todayWh)}</b><span>Today</span></div><div class=stat><b>${fmtWh(d.yesterdayWh)}</b><span>Yesterday</span></div></div>
  <svg class=chart id=chart viewBox="0 0 300 150" preserveAspectRatio=none></svg><div class=axis><span>24 h ago</span><span>12 h</span><span>now</span></div></section>`;
  else h+=`<section class=card><h3>Colour</h3><div class=swatches style="margin:14px 0">${['ff7800','ff3b30','ff2d92','7c5cff','0a84ff','30d158','ffd60a'].map(c=>
- `<button class=swatch style="background:#${c}" onclick="setDev(${d.id},{color:'${c}'})" aria-label="#${c}"></button>`).join('')}<input type=color value="#${d.color}" onchange="setDev(${d.id},{color:this.value.slice(1)})"></div>
+ `<button class=swatch style="background:#${c}${!d.white&&d.color==c?';border-color:#fff;box-shadow:0 0 0 3px #'+c+'55':''}" onclick="setDev(${d.id},{color:'${c}'})" aria-label="#${c}"></button>`).join('')}<input type=color value="#${d.color}" onchange="setDev(${d.id},{color:this.value.slice(1)})"></div>
  <button class="chip ${d.white?'on':''}" onclick="setDev(${d.id},{white:1})">Warm white</button><label>Brightness · ${d.brightness}%</label>
  <input type=range min=5 max=100 value=${d.brightness} onchange="setDev(${d.id},{brightness:this.value})"></section>`;
  const left=d.offAt?d.offAt-now():0;
@@ -231,6 +231,9 @@ function deviceView(){const d=dev();if(!d){view='home';return homeView()}
  <div class=days>${daysText(r.days)}</div></div><button class="sw ${r.enabled?'on':''}" onclick="toggleRule(${i})"></button></div>`;
  if(!S.system.time)h+=`<div class="small" style="color:var(--warn);margin-top:10px">Waiting for the clock to sync before schedules can run.</div>`;
  return h+'</section>'}
+// Lamps glow in their own colour (warm white = amber) instead of the brand gradient.
+function lampGlow(d){if(d.kind=='plug'||!d.on||!d.linked)return'';const c=d.white?'#FFB35C':'#'+d.color;
+ return`background:radial-gradient(circle at 35% 30%,color-mix(in srgb,${c} 45%,#fff),${c} 62%);box-shadow:0 0 0 12px ${c}26,0 20px 70px ${c}88`}
 function daysText(m){if(m==127)return'Every day';if(m==31)return'Weekdays';if(m==96)return'Weekends';return DAYN.filter((_,i)=>m>>i&1).join(' · ')}
 function networkView(){const s=S.system,[b,q,c]=signal(s.rssi),setup=S.mode=='setup';
  return`<button class=back onclick="go('home')">${P(I.back,18)} Home</button>
