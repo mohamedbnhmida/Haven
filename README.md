@@ -44,7 +44,7 @@ Protocol notes: [docs/awox_smartplug.md](docs/awox_smartplug.md) and [PLAN.md](P
   schedules or the plug's own button are pushed back so the assistants stay in sync.
 - **Network panel**: Wi-Fi name, signal, IP, uptime, reconnections, cloud and clock status.
 - **Secure by default**: password on first visit (SHA-256, per-device salt), HttpOnly session cookie.
-- **Self-healing**: automatic Wi-Fi and Bluetooth reconnection; a setup hotspot when Wi-Fi is unreachable.
+- **Self-healing**: automatic Wi-Fi and Bluetooth reconnection; a setup hotspot (captive portal) when Wi-Fi is unreachable.
 
 ## How it works
 
@@ -82,14 +82,16 @@ flowchart LR
    arduino-cli compile -b esp32:esp32:esp32:PartitionScheme=huge_app .
    arduino-cli upload  -b esp32:esp32:esp32:PartitionScheme=huge_app -p /dev/cu.usbserial-0001 .
    ```
-3. **Join Wi-Fi:** on your phone, connect to the **Haven-Setup** hotspot, open http://192.168.4.1,
-   create a password and pick your network.
+3. **Join Wi-Fi:** on your phone, connect to the **Haven-Setup** hotspot. The setup page opens by itself
+   (or browse to http://haven.local); create a password and pick your network.
 4. **Add devices:** open http://haven.local → ⋯ → *Add device* → *Scan*. Close the vendor app first; each
    device accepts one Bluetooth connection at a time. The first plug and lamp get the Sinric Pro IDs from `secrets.h`.
 5. **Voice:** in the Alexa app enable the **Sinric Pro** skill (or link Sinric Pro in Google Home), then
    *“Alexa, turn on SmartPLUG.”*
 
-**Reset:** hold the board's **BOOT** button for 5 s to erase Wi-Fi, password, devices and schedules.
+**Reset (forgotten password, new Wi-Fi):** hold the board's **BOOT** button and let go after
+**3 s** to reset Wi-Fi + password (devices and schedules stay), or after **10 s** to erase everything.
+The blue LED blinks slowly, then fast after 3 s, and stays on after 10 s.
 
 ### Serial console (115200 baud)
 
@@ -99,7 +101,7 @@ flowchart LR
 | `scan` | Lists nearby plugs and lamps |
 | `add plug\|lamp <address> [name]` | Adds a device without the app |
 | `wifi-reset` | Forgets Wi-Fi and the password (devices and schedules stay) |
-| `factory-reset` | Erases everything, like holding BOOT for 5 s |
+| `factory-reset` | Erases everything, like holding BOOT for 10 s |
 
 ## Development
 

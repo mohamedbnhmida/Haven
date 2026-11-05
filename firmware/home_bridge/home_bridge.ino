@@ -2,14 +2,15 @@
 // with a web app, schedules, power monitoring and Alexa / Google Home via Sinric Pro.
 // Protocols: docs/awox_smartplug.md, PLAN.md §1.
 //
-// First boot (or Wi-Fi unreachable): opens AP "Haven-Setup"; browse http://192.168.4.1,
-// create a password and pick the home Wi-Fi. Then http://haven.local (API in web.h).
-// Hold BOOT 5 s = factory reset (Wi-Fi, password, devices, schedules).
+// First boot (or Wi-Fi unreachable): opens AP "Haven-Setup" (captive portal); browse
+// http://haven.local, create a password and pick the home Wi-Fi. Then http://haven.local (API in web.h).
+// BOOT button: hold 3 s = reset Wi-Fi + password, 10 s = erase everything.
 //
 // Build: arduino-cli compile -b esp32:esp32:esp32:PartitionScheme=huge_app
 
 #include <ArduinoJson.h>
 #include <NimBLEDevice.h>
+#include <DNSServer.h>
 #include <ESPmDNS.h>
 #include <Preferences.h>
 #include <SinricPro.h>
@@ -22,6 +23,7 @@
 #include "secrets.h"
 
 Preferences prefs;
+DNSServer dns;
 
 #include "devices.h"
 #include "schedules.h"
@@ -39,16 +41,31 @@ bool joinWifi() {
   return WiFi.status() == WL_CONNECTED;
 }
 
-// Forgotten password or wrong Wi-Fi: hold BOOT for 5 s to wipe settings.
-void checkFactoryReset() {
+constexpr int kBootPin = 0, kLedPin = 2;  // DevKit BOOT button, blue LED
+
+void clearSetup() {  // Wi-Fi + Haven password; devices and schedules stay
+  for (const char* k : {"ssid", "pass", "pwd", "token"}) prefs.remove(k);
+}
+
+// BOOT button, acted on at release: hold 3 s = reset setup (Wi-Fi + password),
+// 10 s = erase everything. The LED blinks slowly, then fast after 3 s, then stays on after 10 s.
+void checkBootButton() {
   static uint32_t pressedAt = 0;
-  if (digitalRead(0) == HIGH) return void(pressedAt = 0);
-  if (!pressedAt) pressedAt = millis();
-  if (millis() - pressedAt > 5000) {
-    Serial.println("factory reset");
-    prefs.clear();
-    ESP.restart();
+  bool down = digitalRead(kBootPin) == LOW;
+  if (down && !pressedAt) pressedAt = millis() | 1;
+  if (!pressedAt) return;
+  uint32_t held = millis() - pressedAt;
+  if (down) {
+    digitalWrite(kLedPin, held >= 10000 ? HIGH : (millis() / (held >= 3000 ? 100 : 400)) % 2);
+    return;
   }
+  pressedAt = 0;
+  digitalWrite(kLedPin, LOW);
+  if (held < 3000) return;
+  if (held >= 10000) prefs.clear(), Serial.println("BOOT: everything erased");
+  else clearSetup(), Serial.println("BOOT: Wi-Fi + password reset");
+  delay(200);
+  ESP.restart();
 }
 
 // Serial console: "status", "wifi-reset" (forget Wi-Fi + password; devices and schedules stay).
@@ -72,13 +89,13 @@ void serialCommands() {
     if (!err) delay(200), ESP.restart();
   } else if (cmd == "scan") {
     Serial.println(scanJson());
-  } else if (cmd == "factory-reset") {  // same as holding BOOT 5 s
+  } else if (cmd == "factory-reset") {  // same as holding BOOT 10 s
     prefs.clear();
     Serial.println("everything cleared, restarting into Haven-Setup");
     delay(200);
     ESP.restart();
   } else if (cmd == "wifi-reset") {
-    for (const char* k : {"ssid", "pass", "pwd", "token"}) prefs.remove(k);
+    clearSetup();
     Serial.println("wifi + password cleared, restarting into Haven-Setup");
     delay(200);
     ESP.restart();
@@ -87,7 +104,8 @@ void serialCommands() {
 
 void setup() {
   Serial.begin(115200);
-  pinMode(0, INPUT_PULLUP);  // BOOT button
+  pinMode(kBootPin, INPUT_PULLUP);
+  pinMode(kLedPin, OUTPUT);
   prefs.begin("bridge");
   loadDevices();
   loadRules();
@@ -106,7 +124,11 @@ void setup() {
     bootScan = scanWifiJson();
     WiFi.mode(WIFI_AP_STA);  // STA side lets the setup page list networks
     WiFi.softAP("Haven-Setup");
-    Serial.println("setup AP: Haven-Setup -> http://192.168.4.1");
+    // Captive portal: every name resolves to the bridge, so phones pop the setup page up
+    // by themselves and http://haven.local works here too.
+    dns.start(53, "*", WiFi.softAPIP());
+    MDNS.begin("haven");
+    Serial.println("setup AP: Haven-Setup -> http://haven.local or http://192.168.4.1");
   }
   startWeb();
   NimBLEDevice::init("Haven");
@@ -114,7 +136,8 @@ void setup() {
 
 void loop() {
   web.handleClient();
-  checkFactoryReset();
+  checkBootButton();
+  if (!online) dns.processNextRequest();
   serialCommands();
   keepLinked();
   runSchedules();

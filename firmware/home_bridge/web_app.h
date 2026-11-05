@@ -115,7 +115,11 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
 .net:hover,.net.sel{border-color:#7C5CFF88;background:#7C5CFF12}
 .lock{width:72px;height:72px;border-radius:24px;margin:8px auto 16px;display:grid;place-items:center;background:#7C5CFF1a;color:#A792FF}
 .swatches{display:flex;gap:10px;flex-wrap:wrap}.swatch{width:40px;height:40px;border-radius:50%;border:2px solid #ffffff22}
-input[type=range]{width:100%;accent-color:#9B80FF}input[type=color]{width:40px;height:40px;border:0;padding:0;background:none}
+input[type=range]{width:100%;accent-color:#9B80FF}
+.busy{pointer-events:none;position:relative;color:transparent!important}.busy>:not(.ld),.sw.busy:after{visibility:hidden}
+.ld{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:5px}.ld i{width:7px;height:7px;border-radius:50%;background:#fff;animation:ld 1s infinite}
+.ld i:nth-child(2){animation-delay:.15s}.ld i:nth-child(3){animation-delay:.3s}.power .ld i{width:12px;height:12px}
+@keyframes ld{0%,80%,100%{transform:scale(.45);opacity:.35}40%{transform:none;opacity:1}}input[type=color]{width:40px;height:40px;border:0;padding:0;background:none}
 #sheetbg{position:fixed;inset:0;z-index:30;background:#000a;opacity:0;visibility:hidden;transition:.25s}#sheetbg.open{opacity:1;visibility:visible}
 #sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;max-width:480px;margin:0 auto;padding:10px 20px calc(24px + env(safe-area-inset-bottom));
 border-radius:28px 28px 0 0;background:var(--card2);border:1px solid var(--line);transform:translateY(105%);transition:transform .3s cubic-bezier(.2,.9,.3,1)}
@@ -154,12 +158,16 @@ search:'<circle cx=11 cy=11 r=7 /><path d="M20 20l-3.5-3.5"/>',trash:'<path d="M
 const $=i=>document.getElementById(i),esc=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const DAYS=['M','T','W','T','F','S','S'],DAYN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 let S=null,view='home',devId=0,skew=0,started=Date.now(),hist={},unreachable=false,authMode='';
-$('splogo').outerHTML=LOGO;$('barlogo').innerHTML=LOGO;$('bmenu').innerHTML=P(I.dots);
+$('splogo').outerHTML=LOGO;if(location.hash=='#nosplash')$('splash').remove();  // screenshots
+$('barlogo').innerHTML=LOGO;$('bmenu').innerHTML=P(I.dots);
 
-async function api(p,body){try{const r=await fetch(p,body?{method:'POST',body:new URLSearchParams(body)}:{});let j={};try{j=await r.json()}catch(e){}
+let lastBtn=null;document.addEventListener('click',e=>{lastBtn=e.target.closest('button');setTimeout(()=>lastBtn=null)},true);
+function busy(b,on){if(!b)return;b.classList.toggle('busy',on);if(on&&!b.querySelector('.ld'))b.insertAdjacentHTML('beforeend','<span class=ld><i></i><i></i><i></i></span>')}
+async function api(p,body){const b=lastBtn;lastBtn=null;busy(b,true);try{return await api0(p,body)}finally{busy(b,false)}}
+async function api0(p,body){try{const r=await fetch(p,body?{method:'POST',body:new URLSearchParams(body)}:{});let j={};try{j=await r.json()}catch(e){}
 unreachable=false;return{ok:r.ok,status:r.status,j}}catch(e){unreachable=true;return{ok:false,status:0,j:{error:'Can\'t reach Haven'}}}}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2600)}
-function splashDone(){if(location.hash=='#splash')return;const w=Math.max(0,1500-(Date.now()-started));setTimeout(()=>$('splash').classList.add('out'),w)}
+function splashDone(){if(location.hash=='#splash'||!$('splash'))return;const w=Math.max(0,1500-(Date.now()-started));setTimeout(()=>$('splash').classList.add('out'),w)}
 function go(v,id){const h='#'+v+(v=='device'?'/'+(id??devId):'');if(location.hash!=h&&v!='login')return location.hash=h;show(v,id)}
 function show(v,id){view=v;if(id!=null)devId=+id;closeMenu();window.scrollTo(0,0);render(true);if(v=='device')loadHist();if(v=='wifi')scanWifi();if(v=='add')$('view')&&scanDevices()}
 async function load(){const r=await api('/api/state');if(r.status==401){authMode=r.j.auth;view='login';render(true);return splashDone()}
@@ -274,7 +282,7 @@ function editRule(i){const d=dev(),r=i>=0?S.rules[i]:{address:d.address,enabled:
 async function saveRules(list){const r=await api('/api/rules',{json:JSON.stringify(list)});if(!r.ok)return toast(r.j.error||'Could not save');S=r.j;closeSheet();render(true);toast('Schedule saved')}
 function toggleRule(i){const list=S.rules.slice();list[i]={...list[i],enabled:!list[i].enabled};saveRules(list)}
 async function timer(m){const r=await api('/api/timer',{id:devId,min:m});if(!r.ok)return toast(r.j.error);S=r.j;render(true);toast(m?'Turns off in '+fmtDur(m*60):'Timer cancelled')}
-async function setDev(id,q){const d=S.devices[id];if(q.on!=null){d.on=!!q.on;render(true)}const r=await api('/api/device',{id,...q});if(r.ok){S=r.j;render(true)}else{toast(r.j.error||'Failed');load()}}
+async function setDev(id,q){const r=await api('/api/device',{id,...q});if(r.ok){S=r.j;render(true)}else{toast(r.j.error||'Failed');load()}}
 async function loadHist(){const d=dev();if(!d||d.kind!='plug')return;const r=await api('/api/history?id='+d.id);if(r.ok){hist[d.id]=r.j;drawChart()}}
 function drawChart(){const c=$('chart'),h=hist[devId];if(!c)return;if(!h){c.innerHTML='';return}
  const w=h.w,max=Math.max(1,...w)*1.15,pts=w.map((v,i)=>[i*300/(w.length-1),150-v/max*140]);
@@ -286,7 +294,12 @@ function drawChart(){const c=$('chart'),h=hist[devId];if(!c)return;if(!h){c.inne
 function loginView(){const c=authMode=='create';return`<section class=card style="margin-top:12vh"><div class=lock>${P(I.lock,30)}</div>
  <h2 class=center>${c?'Secure your Haven':'Welcome back'}</h2><p class="mute center small">${c?'Create a password for this bridge. At least 6 characters.':'Enter your Haven password.'}</p>
  <form onsubmit="return doLogin(event)"><label>Password</label>${eyeField('pw','',c?'new-password':'current-password')}
- ${c?'<label>Confirm password</label>'+eyeField('pw2','','new-password'):''}<button class=btn id=lbtn>${c?'Create & continue':'Sign in'}</button><div class=err id=lerr></div></form></section>`}
+ ${c?'<label>Confirm password</label>'+eyeField('pw2','','new-password'):''}<button class=btn id=lbtn>${c?'Create & continue':'Sign in'}</button><div class=err id=lerr></div></form>
+ ${c?'':'<button type=button class=link style="display:block;margin:14px auto 0" onclick="forgot()">Forgot password?</button>'}</section>`}
+function forgot(){sheet(`<h2>Reset your password</h2><p class=mute>Use the <b style="color:var(--text)">BOOT</b> button on the Haven board (next to the USB port):</p>
+ <div class=kv><span>Hold 3 s</span><b>Reset Wi-Fi + password</b></div><div class=kv><span>Hold 10 s</span><b>Erase everything</b></div>
+ <p class="mute small">The blue light blinks slowly, then fast after 3 s, and stays on after 10 s. Let go to apply. Your devices and schedules are kept with the 3 s reset.
+ Then join the <b style="color:var(--text)">Haven-Setup</b> Wi-Fi and open haven.local.</p><button class=btn onclick="closeSheet()">Got it</button>`)}
 async function doLogin(e){e.preventDefault();if(authMode=='create'&&$('pw').value!=$('pw2').value){$('lerr').textContent='Passwords don\'t match';return false}
  $('lbtn').disabled=true;const r=await api('/api/login',{password:$('pw').value});$('lbtn').disabled=false;
  if(r.ok){view='home';load()}else $('lerr').textContent=r.j.error||'Sign-in failed';return false}

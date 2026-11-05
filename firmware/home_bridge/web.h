@@ -267,5 +267,12 @@ void startWeb() {
     restartSoon();
   });
 
+  // Setup hotspot: any other URL (phones' captive-portal checks) lands on the app.
+  web.onNotFound([] {
+    if (online) return web.send(404, "text/plain", "Not found");
+    web.sendHeader("Location", "http://192.168.4.1/");
+    web.send(302, "text/plain", "");
+  });
+
   web.begin();
 }
