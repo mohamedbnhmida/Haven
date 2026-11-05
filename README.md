@@ -128,3 +128,5 @@ python3 tools/preview.py --login   # sign-in screen on :8081
 - Plug power readings are assumed to be milliwatts; confirm with a known load.
 - Tunisia time zone (`CET-1`) is set in `schedules.h`; change `kTimeZone` for elsewhere.
 - Not affiliated with AwoX, Revogi or Shada.
+- Banner logos: Alexa ring from [Simple Icons](https://simpleicons.org) (CC0), Google Home from [SVG Logos](https://github.com/gilbarbara/logos) (CC0).
+  Amazon, Alexa and Google Home are trademarks of their owners; Haven connects to them through Sinric Pro.
