@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/banner.svg" alt="Haven — Bluetooth devices bridge" width="100%"></p>
+<p align="center"><img src="docs/banner.png" alt="Haven — Bluetooth devices bridge" width="100%"></p>
 
 <p align="center">
   <img alt="ESP32" src="https://img.shields.io/badge/ESP32-Arduino%20core%203.3-7C5CFF?style=flat-square">
