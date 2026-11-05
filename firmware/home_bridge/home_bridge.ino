@@ -87,6 +87,18 @@ void serialCommands() {
                               : addDevice(addr, 0, kind == "lamp", sp2 < 0 ? "" : cmd.substring(sp2 + 1));
     Serial.println(err ? err : "added, restarting");
     if (!err) delay(200), ESP.restart();
+  } else if (cmd.startsWith("dev ")) {  // dev <n> on|off|white|rrggbb
+    int sp = cmd.indexOf(' ', 4), n = cmd.substring(4, sp).toInt();
+    String what = sp < 0 ? "" : cmd.substring(sp + 1);
+    if (sp < 0 || n < 0 || n >= deviceCount) return void(Serial.println("usage: dev <n> on|off|white|rrggbb"));
+    Device& d = devices[n];
+    if (what.length() == 6 && !d.isPlug()) {
+      long c = strtol(what.c_str(), nullptr, 16);
+      d.r = c >> 16, d.g = c >> 8, d.b = c, d.white = false;
+    } else if (what == "white") {
+      d.white = true;
+    }
+    Serial.printf("%s %s: %s\n", d.name.c_str(), what.c_str(), setOn(d, what != "off") ? "sent" : "out of reach");
   } else if (cmd == "scan") {
     Serial.println(scanJson());
   } else if (cmd == "factory-reset") {  // same as holding BOOT 10 s

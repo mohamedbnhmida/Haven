@@ -99,6 +99,7 @@ The blue LED blinks slowly, then fast after 3 s, and stays on after 10 s.
 |---|---|
 | `status` | Wi-Fi, cloud, memory and each device's link and state |
 | `scan` | Lists nearby plugs and lamps |
+| `dev <n> on\|off\|white\|rrggbb` | Controls device number *n* (colours for lamps) |
 | `add plug\|lamp <address> [name]` | Adds a device without the app |
 | `wifi-reset` | Forgets Wi-Fi and the password (devices and schedules stay) |
 | `factory-reset` | Erases everything, like holding BOOT for 10 s |

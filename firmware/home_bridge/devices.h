@@ -10,10 +10,11 @@ constexpr int kBuckets = 96;     // …over 24 h
 static NimBLEUUID kPlugService("0000fff0-0000-1000-8000-00805f9b34fb");
 static NimBLEUUID kPlugCommand("0000fff3-0000-1000-8000-00805f9b34fb");
 static NimBLEUUID kPlugReply("0000fff4-0000-1000-8000-00805f9b34fb");
-static NimBLEUUID kLampService("0000cc02-0000-1000-8000-00805f9b34fb");
+// The lamp reports 16-bit UUIDs; NimBLE won't match them against the 128-bit spelling.
+static NimBLEUUID kLampService((uint16_t)0xcc02);
 static NimBLEUUID kLampAdvert("ffffcc02-0000-1000-8000-00805f9b34fb");
-static NimBLEUUID kLampUnlock("0000ee02-0000-1000-8000-00805f9b34fb");
-static NimBLEUUID kLampColor("0000ee03-0000-1000-8000-00805f9b34fb");
+static NimBLEUUID kLampUnlock((uint16_t)0xee02);
+static NimBLEUUID kLampColor((uint16_t)0xee03);
 
 struct Device {
   String name, address, sinricId;
@@ -194,9 +195,12 @@ bool connectDevice(int i) {
     d.client = NimBLEDevice::createClient();
     d.client->setConnectTimeout(5000);  // ms; an absent device must not stall the loop for long
   }
-  if (!d.client->connect(NimBLEAddress(std::string(d.address.c_str()), d.addrType))) return false;
+  if (!d.client->connect(NimBLEAddress(std::string(d.address.c_str()), d.addrType)))
+    return Serial.printf("%s: no connection (type %d)\n", d.name.c_str(), d.addrType), false;
+  // Full discovery first: the lamp's Quintic chip doesn't answer discover-by-UUID.
+  d.client->getServices(true);
   NimBLERemoteService* svc = d.client->getService(d.isPlug() ? kPlugService : kLampService);
-  if (!svc) return d.client->disconnect(), false;
+  if (!svc) return Serial.printf("%s: service missing\n", d.name.c_str()), d.client->disconnect(), false;
 
   if (d.isPlug()) {
     d.tx = svc->getCharacteristic(kPlugCommand);
@@ -213,7 +217,8 @@ bool connectDevice(int i) {
   } else {
     NimBLERemoteCharacteristic* unlock = svc->getCharacteristic(kLampUnlock);
     d.tx = svc->getCharacteristic(kLampColor);
-    if (!unlock || !d.tx) return d.tx = nullptr, d.client->disconnect(), false;
+    if (!unlock || !d.tx)
+      return Serial.printf("%s: characteristics missing\n", d.name.c_str()), d.tx = nullptr, d.client->disconnect(), false;
     uint8_t word[] = {'q', 'u', 'i', 'n', 't', 'i', 'c'};  // unlock, once per connection
     unlock->writeValue(word, sizeof word, !unlock->canWriteNoResponse());
   }
